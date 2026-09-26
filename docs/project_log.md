@@ -155,3 +155,11 @@
   - **Email Dispatching:** Made `EmailService.sendOtpEmail` non-blocking to ensure instant API responses on signup and login. Added testing helper notes on the frontend Auth OTP card.
   - **RPC Resilience:** Introduced `getJsonRpcProvider()` with static network configuration (Chain ID `80002` for Polygon Amoy) to prevent ethers.js from retrying indefinitely during network hiccups.
   - **Clean Shutdown:** Stopped all background server instances (`demo.js`) cleanly as requested by the user.
+
+## [2026-09-26] Phase 20: GitHub Repository Deployment & Professional Documentation
+- **Summary:** Published the complete Invisible Web3 codebase to GitHub as a public open-source repository for portfolio showcase.
+- **Details:**
+  - **Security Audit:** Verified 74 staged files contain zero sensitive data — all `.env` files, `dev.db` databases, private keys, SMTP credentials, Ngrok tokens, and personal documents excluded via hardened `.gitignore`.
+  - **Professional README:** Created industry-standard README.md with ASCII architecture diagram, Mermaid sequence diagram, feature breakdown across 4 layers, complete tech stack table, setup guide, smart contract address registry, API reference, and development journey timeline.
+  - **LICENSE:** Added MIT License.
+  - **Repository:** `https://github.com/Zenkairow/Invisible-Web3` — 74 files, 7,192 lines of code across 10 Solidity contracts, 14 backend services, and 6 frontend pages.
