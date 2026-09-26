@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id                 String    @id @default(uuid())
+
+  // Auth Identity (at least one required at app level)
+  email              String?   @unique
+  mobile             String?   @unique
+  passwordHash       String
+
+  // Profile
+  firstName          String?
+  lastName           String?
+  displayName        String?
+
+  // KYC
+  kycStatus          String    @default("PENDING") // PENDING | SUBMITTED | VERIFIED
+
+  // UPI (user-provided payout detail, NOT identity)
+  upiId              String?
+
+  // Web3 Identity
+  smartWalletAddress String?
+  publicKey          String?
+
+  // Account State
+  isEmailVerified    Boolean   @default(false)
+  isMobileVerified   Boolean   @default(false)
+  lastLoginAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  // Relations
+  ledgers            Ledger[]
+  transactions       Transaction[]
+  invoices           Invoice[]
+  aiAgents           AIAgent[]
+  credentials        Credential[]
+  fiatDeposits       FiatDeposit[]
+  fiatWithdrawals    FiatWithdrawal[]
+}
+
+model OtpVerification {
+  id        String   @id @default(uuid())
+  target    String   // email or mobile number
+  otp       String
+  purpose   String   // SIGNUP | LOGIN | LINK_ACCOUNT
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Ledger {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  amount      Float
+  description String
+  createdAt   DateTime @default(now())
+}
+
+model Transaction {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id])
+  upiTransactionId String   @unique
+  blockchainTxHash String?
+  status           String   @default("PENDING")
+  createdAt        DateTime @default(now())
+}
+
+model Invoice {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  amount      Float
+  description String
+  clientName  String?
+  clientEmail String?
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+}
+
+model AIAgent {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  agentAddress  String
+  agentPrivKey  String
+  dailyBudget   Float
+  spentToday    Float    @default(0)
+  createdAt     DateTime @default(now())
+}
+
+model Credential {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  tokenId     Int
+  title       String
+  metadataURI String
+  isSoulbound Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model FiatDeposit {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  amountINR    Float
+  expectedUSDC Float
+  utrNumber    String   @unique
+  status       String   @default("PENDING") // PENDING | APPROVED | REJECTED
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model FiatWithdrawal {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  amountUSDC   Float
+  amountINR    Float
+  userUpiId    String
+  status       String   @default("PENDING") // PENDING | PAID | REJECTED
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
